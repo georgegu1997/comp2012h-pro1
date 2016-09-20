@@ -48,15 +48,16 @@ int Server::sock() //create a sockfd and bing it to the server address. It retur
   return sockfd;
 }
 
-void Server::gen_price(int newsockfd)
+void Server::gen_price(int newsockfd) //function broadcasting the price every second
 {
   int n;
-  struct package pkg = gen_pkg(0);// create a package to broadcast price infomation
 
-  if (pkg.gen_time - *last_change >= change_interval) {
+  if (time(NULL) - *last_change >= change_interval) {
     change_price();
   }
   //the price will change in every change_interval seconds.
+
+  struct package pkg = gen_pkg(0);// create a package to broadcast price infomation
 
   n = write(newsockfd, &pkg, sizeof(pkg));
   if (n<0) error("ERROE writing to socket"); //write to the socket
@@ -83,43 +84,42 @@ struct Server::package Server::gen_response_pkg(int arg1, struct package arg2) /
   new_pkg.gen_price = *price;
   new_pkg.response_to_time = arg2.gen_time;
   new_pkg.response_to_price = arg2.gen_price;
-  //the pakcage content the message of the puchase request.
+  //the pakcage contain the message of the puchase request.
   return new_pkg;
 }
 
-void Server::process_buy_request(int newsockfd)
+void Server::process_buy_request(int newsockfd) //function handling all packages received
 {
   int n;
-  struct package rcv_pkg;
-  struct package send_pkg;
+  struct package rcv_pkg; //received package
+  struct package send_pkg; //package to be sent
 
   n = read(newsockfd, &rcv_pkg, sizeof(rcv_pkg));
-
-  sleep(1);
-
   if (n<0) error("ERROE reading from socket");
 
   if (rcv_pkg.type == 1) {
     *buy_count += 1;
-    if ((rcv_pkg.gen_price - *price) < 1e-6) {
-      send_pkg = gen_response_pkg(2, rcv_pkg);
+    if ((rcv_pkg.gen_price - *price) < 1e-6) { //compare two fouble float.
+      //sleep(1); //this line is totally used to simulate the delay of the network and the processing time of the computer
+      send_pkg = gen_response_pkg(2, rcv_pkg); //generate package meaning buy SUCCESS
     }
     else {
-      send_pkg = gen_response_pkg(3, rcv_pkg);
+      //sleep(1); //this line is totally used to simulate the delay of the network and the processing time of the computer
+      send_pkg = gen_response_pkg(3, rcv_pkg); //generate package meaning buy FAIL
     }
     n = write(newsockfd, &send_pkg, sizeof(send_pkg));
     printf("total puchases: %d\n", *buy_count);
   }
 }
 
-void Server::change_price()
+void Server::change_price() //function used to change the mmap variable price
 {
-  srand((unsigned)time(NULL));
-  *price = rand() / double(RAND_MAX);
+  srand((unsigned)time(NULL)); //this line is used to change the seed of rand number
+  *price = rand() / double(RAND_MAX); //to ensure that price are between 0 and 1
   *last_change = time(NULL);
 }
 
-void Server::error(const char *msg)
+void Server::error(const char *msg) //function hanling error message
 {
   perror(msg);
   exit(1);

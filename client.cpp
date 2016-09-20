@@ -12,12 +12,13 @@
 
 /* TODO: define Client member functions */
 
-Client::Client(char* arg1, int arg2)
+Client::Client(char* arg1, int arg2) // constructor
 {
   hostname = arg1;
   portno = arg2;
-  buffer = (char *) mmap(NULL, sizeof(char) * 256, PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_SHARED, -1, 0);
   price = (double *) mmap(NULL, sizeof(double), PROT_READ|PROT_WRITE, MAP_ANONYMOUS|MAP_SHARED, -1, 0);
+  // initialize some variables. price is a pointer variable using mmap
+
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if (sockfd < 0 ) {
     error("ERROR opening socket");
@@ -34,10 +35,11 @@ Client::Client(char* arg1, int arg2)
   if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0){
     error("ERROR connecting");
   }
+  //create the sockfd and connnect it to the server
 }
 
 
-void Client::get_price()
+void Client::get_price() // Actually handle all the packages received, sort out the infomation, and print the corresponding infomation
 {
   int n;
   struct package pkg;
@@ -46,34 +48,30 @@ void Client::get_price()
     error("ERROR reading from socket");
   }
 
-  if (pkg.type == 0) {
+  if (pkg.type == 0) { // handling price-broadcasting message
     *price = pkg.gen_price;
     printf("$%0.2f %s", pkg.gen_price, ctime(&pkg.gen_time));
   }
-  else if (pkg.type == 1) {
-    printf("error package sent\n");
+  else if (pkg.type == 1) { // handling the situation that should not appear
+    printf("error package received\n");
   }
-  else if (pkg.type == 2) {
+  else if (pkg.type == 2) { //handling buy SUCCESS message
     printf("client buy at %0.2f at %s", pkg.response_to_price, ctime(&pkg.response_to_time));
     printf("server sell at %0.2f at %s", pkg.gen_price, ctime(&pkg.gen_time));
     printf("buy SUCCESS\n");
   }
-  else if (pkg.type == 3) {
+  else if (pkg.type == 3) { //handling buy FAIL message
     printf("client buy at %0.2f at %s", pkg.response_to_price, ctime(&pkg.response_to_time));
     printf("server sell at %0.2f at %s", pkg.gen_price, ctime(&pkg.gen_time));
     printf("buy FAIL\n");
   }
-  //if (*buf == '$') {
-  //  strcpy(price_info, buf);
-  //}
-  //printf("%s", buf);
 }
 
-void Client::gen_buy_request()
+void Client::gen_buy_request() //generate buy request with the wanted price, and send it to the server
 {
-  if(getchar() != '\n') return;
+  if(getchar() != '\n') return; // run through this only if the input is a ENTER, and ignore all others
 
-  sleep(1);
+  //sleep(1); //this line is totally used to simulate the delay of the network and the processing time of the computer
 
   struct package pkg;
   pkg = gen_pkg(1);
@@ -84,7 +82,7 @@ void Client::gen_buy_request()
   if (n < 0) error("ERROR writing into socket");
 }
 
-struct Client::package Client::gen_pkg(int arg1)
+struct Client::package Client::gen_pkg(int arg1) //function to generate package including the wanted price and current time
 {
   struct package new_pkg;
   new_pkg.type = arg1;
@@ -93,7 +91,7 @@ struct Client::package Client::gen_pkg(int arg1)
   return new_pkg;
 }
 
-void Client::error(const char *msg)
+void Client::error(const char *msg) //handling error messages
 {
   perror(msg);
   exit(1);
