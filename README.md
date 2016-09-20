@@ -9,4 +9,4 @@
 # Actually I found that the real time of transmission is so short that it is very difficult for a buy request to FAIL.
 # So I added two sleep(1) after the generation of the packages and before write() function. These are the simply simulation of the delay of the network.
 # After that, I found that the client can only send one request in one second, however, which is identical as the sample programs do.
-# The failure of buy request now will appear at the last second before price changes, and may appear on other requests depending on the real delay of the network
+# The failure of buy request now will appear on the packages that are sent at the last second before price changes, and may appear on other requests depending on the real delay of the network
