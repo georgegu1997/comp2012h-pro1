@@ -58,12 +58,12 @@ void Client::get_price() // Actually handle all the packages received, sort out 
   else if (pkg.type == 2) { //handling buy SUCCESS message
     printf("client buy at %0.2f at %s", pkg.response_to_price, ctime(&pkg.response_to_time));
     printf("server sell at %0.2f at %s", pkg.gen_price, ctime(&pkg.gen_time));
-    printf("buy SUCCESS\n");
+    printf("all times approx\nbuy SUCCESS\n");
   }
   else if (pkg.type == 3) { //handling buy FAIL message
     printf("client buy at %0.2f at %s", pkg.response_to_price, ctime(&pkg.response_to_time));
     printf("server sell at %0.2f at %s", pkg.gen_price, ctime(&pkg.gen_time));
-    printf("buy FAIL\n");
+    printf("all times approx\nbuy FAIL\n");
   }
 }
 
