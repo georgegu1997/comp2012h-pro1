@@ -100,13 +100,12 @@ void Server::process_buy_request(int newsockfd) //function handling all packages
   if (rcv_pkg.type == 1) {
     *buy_count += 1;
     if ((rcv_pkg.gen_price - *price) < 1e-6) { //compare two fouble float.
-      //sleep(1); //this line is totally used to simulate the delay of the network and the processing time of the computer
       send_pkg = gen_response_pkg(2, rcv_pkg); //generate package meaning buy SUCCESS
     }
     else {
-      //sleep(1); //this line is totally used to simulate the delay of the network and the processing time of the computer
       send_pkg = gen_response_pkg(3, rcv_pkg); //generate package meaning buy FAIL
     }
+    sleep(1); //this line is totally used to simulate the delay of the network and the processing time of the computer
     n = write(newsockfd, &send_pkg, sizeof(send_pkg));
     printf("total puchases: %d\n", *buy_count);
   }

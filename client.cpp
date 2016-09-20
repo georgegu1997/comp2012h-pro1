@@ -71,10 +71,9 @@ void Client::gen_buy_request() //generate buy request with the wanted price, and
 {
   if(getchar() != '\n') return; // run through this only if the input is a ENTER, and ignore all others
 
-  //sleep(1); //this line is totally used to simulate the delay of the network and the processing time of the computer
-
   struct package pkg;
   pkg = gen_pkg(1);
+  sleep(1); //this line is totally used to simulate the delay of the network and the processing time of the computer
 
   int n;
   printf("from Client: client send buy request at %0.2f at %s", pkg.gen_price, ctime(&pkg.gen_time));
