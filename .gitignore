@@ -1,0 +1,3 @@
+*.o
+/server_main
+/client_main
